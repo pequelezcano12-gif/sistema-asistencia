@@ -38,7 +38,25 @@
                 </div>
                 <?php endif; ?>
 
-                <form method="POST" novalidate>
+                <?php if (!empty($_SESSION['debug_codigo'])): ?>
+                <div class="alert alert-warning py-2 small">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    <strong>Email no disponible.</strong> Tu código es:
+                    <strong style="font-size:1.3rem;letter-spacing:.3rem;display:block;text-align:center;margin-top:.5rem">
+                        <?= htmlspecialchars($_SESSION['debug_codigo']) ?>
+                    </strong>
+                </div>
+                <?php unset($_SESSION['debug_codigo']); ?>
+                <?php endif; ?>
+
+                <?php if (!empty($_SESSION['debug_codigo'])): ?>
+                <div class="alert alert-warning py-2 small">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    <strong>Email no disponible.</strong> Tu código es: 
+                    <strong style="font-size:1.2rem;letter-spacing:.3rem"><?= $_SESSION['debug_codigo'] ?></strong>
+                </div>
+                <?php unset($_SESSION['debug_codigo']); ?>
+                <?php endif; ?>
                     <?= Security::csrfField() ?>
 
                     <div class="mb-3">

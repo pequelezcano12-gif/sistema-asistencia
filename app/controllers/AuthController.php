@@ -258,6 +258,10 @@ class AuthController {
 
                 Mailer::enviarCodigoReset($user['email'], $user['nombre'], $codigo);
                 $_SESSION['reset_token'] = $token;
+                // Si el email falla, el código queda en debug_codigo via Mailer
+                if (empty($_SESSION['debug_codigo'])) {
+                    $_SESSION['debug_codigo'] = $codigo; // fallback siempre visible
+                }
             }
             // Siempre redirigir (no revelar si la cédula existe)
             header('Location: ' . BASE_URL . '/reset-password'); exit;

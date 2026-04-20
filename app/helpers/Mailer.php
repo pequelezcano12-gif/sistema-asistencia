@@ -69,6 +69,7 @@ class Mailer {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = MAIL_PORT;
             $mail->CharSet    = 'UTF-8';
+            $mail->Timeout    = 10; // 10 segundos máximo
 
             $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
             $mail->addAddress($to);
@@ -80,9 +81,11 @@ class Mailer {
             $mail->send();
             return true;
         } catch (Exception $e) {
-            // Guardar error en log
+            // Si falla el email, guardar código en sesión como fallback
             $log = date('Y-m-d H:i:s') . " | MAIL ERROR: " . $mail->ErrorInfo . "\n";
-            file_put_contents(__DIR__ . '/../../storage/logs/emails.log', $log, FILE_APPEND);
+            @file_put_contents(__DIR__ . '/../../storage/logs/emails.log', $log, FILE_APPEND);
+            // Guardar código en sesión para mostrarlo en pantalla
+            $_SESSION['debug_codigo'] = $codigo ?? '';
             return false;
         }
     }
