@@ -1,4 +1,5 @@
 <?php
+// Configuracion de base de datos y servicios - v2
 // Parsear DATABASE_URL de Railway si existe
 $dbUrl = getenv('DATABASE_URL');
 if ($dbUrl) {
