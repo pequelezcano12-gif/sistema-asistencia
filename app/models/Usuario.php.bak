@@ -1,0 +1,64 @@
+<?php
+require_once __DIR__ . '/../../config/database.php';
+
+class Usuario {
+    private PDO $db;
+
+    public function __construct() { $this->db = getDB(); }
+
+    public function findByEmail(string $email): ?array {
+        $st = $this->db->prepare("SELECT * FROM usuarios WHERE email = :e AND activo = TRUE");
+        $st->execute([':e' => $email]);
+        return $st->fetch() ?: null;
+    }
+
+    public function findById(int $id): ?array {
+        $st = $this->db->prepare("SELECT * FROM usuarios WHERE id = :id");
+        $st->execute([':id' => $id]);
+        return $st->fetch() ?: null;
+    }
+
+    public function getAll(?string $rol = null): array {
+        if ($rol) {
+            $st = $this->db->prepare("SELECT * FROM usuarios WHERE rol = :r ORDER BY apellido, nombre");
+            $st->execute([':r' => $rol]);
+        } else {
+            $st = $this->db->query("SELECT * FROM usuarios ORDER BY rol, apellido, nombre");
+        }
+        return $st->fetchAll();
+    }
+
+    public function create(array $data): int|false {
+        $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+        $st = $this->db->prepare(
+            "INSERT INTO usuarios (nombre, apellido, email, password, rol)
+             VALUES (:n, :a, :e, :p, :r) RETURNING id"
+        );
+        $st->execute([':n'=>$data['nombre'],':a'=>$data['apellido'],':e'=>$data['email'],':p'=>$hash,':r'=>$data['rol']]);
+        return $st->fetchColumn();
+    }
+
+    public function update(int $id, array $data): bool {
+        $st = $this->db->prepare(
+            "UPDATE usuarios SET nombre=:n, apellido=:a, email=:e, rol=:r, activo=:ac WHERE id=:id"
+        );
+        return $st->execute([':n'=>$data['nombre'],':a'=>$data['apellido'],':e'=>$data['email'],
+                             ':r'=>$data['rol'],':ac'=>(bool)$data['activo'],':id'=>$id]);
+    }
+
+    public function updatePassword(int $id, string $password): bool {
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $st = $this->db->prepare("UPDATE usuarios SET password=:p WHERE id=:id");
+        return $st->execute([':p'=>$hash,':id'=>$id]);
+    }
+
+    public function updateFoto(int $id, string $foto): bool {
+        $st = $this->db->prepare("UPDATE usuarios SET foto=:f WHERE id=:id");
+        return $st->execute([':f'=>$foto,':id'=>$id]);
+    }
+
+    public function delete(int $id): bool {
+        $st = $this->db->prepare("UPDATE usuarios SET activo=FALSE WHERE id=:id");
+        return $st->execute([':id'=>$id]);
+    }
+}

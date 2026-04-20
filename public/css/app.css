@@ -1,0 +1,76 @@
+:root {
+    --sidebar-width: 0px;
+}
+
+body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,.15);
+}
+
+.card {
+    border-radius: .75rem;
+    transition: box-shadow .2s;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,.1) !important;
+}
+
+.table th {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: .75rem;
+    padding: .35em .65em;
+}
+
+.btn {
+    border-radius: .5rem;
+}
+
+.form-control, .form-select {
+    border-radius: .5rem;
+}
+
+.progress {
+    border-radius: 99px;
+}
+
+/* Estado colors en tabla asistencia */
+.table-success td { background-color: rgba(25,135,84,.08) !important; }
+.table-danger  td { background-color: rgba(220,53,69,.08) !important; }
+.table-warning td { background-color: rgba(255,193,7,.08) !important; }
+.table-info    td { background-color: rgba(13,202,240,.08) !important; }
+
+/* Avatar placeholder */
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: .85rem;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .container-fluid { padding: 1rem; }
+    .table-responsive { font-size: .85rem; }
+}
+
+/* Print styles */
+@media print {
+    .navbar, .btn, form { display: none !important; }
+    .card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+}

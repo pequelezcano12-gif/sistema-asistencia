@@ -1,0 +1,89 @@
+<?php
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+class Mailer {
+
+    public static function enviarCodigoReset(string $email, string $nombre, string $codigo): bool {
+        $asunto = 'Código para restablecer tu contraseña — AsistenciaEdu';
+        $cuerpo = self::template(
+            'Restablecer contraseña',
+            $nombre,
+            'Tu código de verificación es:',
+            "<div style='font-size:2.5rem;font-weight:bold;letter-spacing:.5rem;color:#1a73e8;text-align:center;padding:1rem;background:#f0f4ff;border-radius:.5rem'>$codigo</div>",
+            'Este código expira en <strong>15 minutos</strong>. Si no solicitaste esto, ignorá este mensaje.'
+        );
+        return self::send($email, $asunto, $cuerpo);
+    }
+
+    public static function enviarCodigoVerificacion(string $email, string $nombre, string $codigo): bool {
+        $asunto = 'Verificá tu cuenta — AsistenciaEdu';
+        $cuerpo = self::template(
+            'Verificación de cuenta',
+            $nombre,
+            'Tu código de verificación es:',
+            "<div style='font-size:2.5rem;font-weight:bold;letter-spacing:.5rem;color:#1a73e8;text-align:center;padding:1rem;background:#f0f4ff;border-radius:.5rem'>$codigo</div>",
+            'Este código expira en <strong>30 minutos</strong>.'
+        );
+        return self::send($email, $asunto, $cuerpo);
+    }
+
+    private static function template(string $titulo, string $nombre, string $texto1, string $contenido, string $texto2): string {
+        return "<!DOCTYPE html><html><head><meta charset='UTF-8'></head>
+        <body style='font-family:Segoe UI,sans-serif;background:#f5f5f5;padding:2rem'>
+        <div style='max-width:480px;margin:auto;background:#fff;border-radius:1rem;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,.1)'>
+            <div style='text-align:center;margin-bottom:1.5rem'>
+                <span style='font-size:2rem'>📋</span>
+                <h2 style='color:#1a73e8;margin:.5rem 0'>AsistenciaEdu</h2>
+            </div>
+            <h3 style='color:#333'>$titulo</h3>
+            <p>Hola <strong>" . htmlspecialchars($nombre) . "</strong>,</p>
+            <p>$texto1</p>
+            $contenido
+            <p style='color:#666;font-size:.9rem;margin-top:1.5rem'>$texto2</p>
+            <hr style='border:none;border-top:1px solid #eee;margin:1.5rem 0'>
+            <p style='color:#999;font-size:.8rem;text-align:center'>AsistenciaEdu &copy; " . date('Y') . "</p>
+        </div></body></html>";
+    }
+
+    private static function send(string $to, string $subject, string $body): bool {
+        // Modo dev: guardar en log
+        if (defined('MAIL_DEV_MODE') && MAIL_DEV_MODE) {
+            preg_match('/\d{6}/', strip_tags($body), $m);
+            $log = date('Y-m-d H:i:s') . " | TO: $to | SUBJECT: $subject | CODIGO: " . ($m[0] ?? 'N/A') . "\n---\n";
+            file_put_contents(__DIR__ . '/../../storage/logs/emails.log', $log, FILE_APPEND);
+            return true;
+        }
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = MAIL_HOST;
+            $mail->SMTPAuth   = true;
+            $mail->Username   = MAIL_USER;
+            $mail->Password   = MAIL_PASS;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = MAIL_PORT;
+            $mail->CharSet    = 'UTF-8';
+
+            $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
+            $mail->addAddress($to);
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+            $mail->AltBody = strip_tags($body);
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            // Guardar error en log
+            $log = date('Y-m-d H:i:s') . " | MAIL ERROR: " . $mail->ErrorInfo . "\n";
+            file_put_contents(__DIR__ . '/../../storage/logs/emails.log', $log, FILE_APPEND);
+            return false;
+        }
+    }
+}
