@@ -1,6 +1,11 @@
 ﻿FROM php:8.2-apache
 
-RUN apt-get update && apt-get install -y libpq-dev zip unzip git && docker-php-ext-install pdo pdo_pgsql pgsql && a2enmod rewrite && a2dismod mpm_event && a2enmod mpm_prefork
+RUN apt-get update && apt-get install -y libpq-dev zip unzip git \
+    && docker-php-ext-install pdo pdo_pgsql pgsql \
+    && a2enmod rewrite \
+    && sed -i "s/mpm_event/mpm_prefork/" /etc/apache2/mods-enabled/mpm_event.load 2>/dev/null || true \
+    && a2dismod mpm_event 2>/dev/null || true \
+    && a2enmod mpm_prefork 2>/dev/null || true
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
