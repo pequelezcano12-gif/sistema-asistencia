@@ -16,8 +16,15 @@ if ($dbUrl) {
     define('DB_PASS', getenv('PGPASSWORD') ?: '123');
 }
 
-$domain = getenv('RAILWAY_PUBLIC_DOMAIN');
-define('BASE_URL', $domain ? 'https://' . $domain : 'http://localhost/sistema-asistencia/public');
+$domain = getenv('RAILWAY_PUBLIC_DOMAIN') ?: getenv('RAILWAY_STATIC_URL') ?: '';
+if ($domain) {
+    define('BASE_URL', 'https://' . $domain);
+} else {
+    // Detectar dominio automáticamente desde la request
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    define('BASE_URL', $scheme . '://' . $host);
+}
 
 define('MAIL_DEV_MODE', false);
 define('MAIL_HOST',      getenv('MAIL_HOST')      ?: 'sandbox.smtp.mailtrap.io');
