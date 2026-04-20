@@ -14,8 +14,8 @@ require_once __DIR__ . '/../app/models/Notificacion.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base = parse_url(BASE_URL, PHP_URL_PATH);
+$uri  = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$base = parse_url(BASE_URL, PHP_URL_PATH) ?? '';
 $path = '/' . trim(substr($uri, strlen($base)), '/');
 
 // Auth
