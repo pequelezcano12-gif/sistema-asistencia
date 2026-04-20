@@ -27,11 +27,11 @@ if ($domain) {
 }
 
 define('MAIL_DEV_MODE', false);
-define('MAIL_HOST',      getenv('MAIL_HOST')      ?: 'sandbox.smtp.mailtrap.io');
-define('MAIL_PORT',      (int)(getenv('MAIL_PORT') ?: 2525));
-define('MAIL_USER',      getenv('MAIL_USER')      ?: '9965ce089f00fb');
-define('MAIL_PASS',      getenv('MAIL_PASS')      ?: 'dbbd7379d88718');
-define('MAIL_FROM',      getenv('MAIL_FROM')      ?: 'noreply@asistenciaedu.com');
+define('MAIL_HOST',      getenv('MAIL_HOST')      ?: 'smtp-relay.brevo.com');
+define('MAIL_PORT',      (int)(getenv('MAIL_PORT') ?: 587));
+define('MAIL_USER',      getenv('MAIL_USER')      ?: 'a8b11b001@smtp-brevo.com');
+define('MAIL_PASS',      getenv('MAIL_PASS')      ?: 'xsmtpsib-6d92559fcd6e684e0ea8ed00ad56071af3050a152c7b3bf3e53ef8cf51f7f446-ZdrchaV0IdPS8EOg');
+define('MAIL_FROM',      getenv('MAIL_FROM')      ?: 'a8b11b001@smtp-brevo.com');
 define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'AsistenciaEdu');
 
 function getDB(): PDO {
